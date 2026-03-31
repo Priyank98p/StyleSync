@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@media (max-width:640px){
+    a.active{
+        background-color: black;
+        color: white;
+    }
+}
+
+/* index.css */
+
+@keyframes color-flash {
+  0%, 100% { color: black; }
+  50% { color: #b5b9bd; } /* This is Tailwind's text-gray-400 */
+}
+
+.animate-color-flash {
+  animation: color-flash 2s infinite;
+}
