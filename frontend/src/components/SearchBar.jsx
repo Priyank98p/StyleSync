@@ -11,11 +11,13 @@ const SearchBar = () => {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname.includes("collections") || location.pathname === "/") {
+    if (
+      location.pathname.includes("collections") ||
+      location.pathname === "/"
+    ) {
       setVisible(true);
-    } 
-    else{
-        setVisible(false)
+    } else {
+      setVisible(false);
     }
   }, [location]);
 

@@ -8,13 +8,14 @@ import PriceSlider from "../components/PriceSlider";
 const Collections = () => {
   const [showFilters, setShowFilter] = useState(false);
   const [filterProducts, setfilterProducts] = useState([]);
-  const { products } = useContext(ShopContext);
   const [category, setCategory] = useState([]);
   const [subCategory, setSubcategory] = useState([]);
   const [sortType, setSortType] = useState("newest");
 
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(500);
+
+  const { products, search, showSearch } = useContext(ShopContext);
 
   const toggleCategory = (e) => {
     if (category.includes(e.target.value)) {
@@ -34,6 +35,12 @@ const Collections = () => {
 
   const applyFilterAndSort = () => {
     let productsCopy = products.slice();
+
+    if (showSearch && search) {
+      productsCopy = productsCopy.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase()),
+      );
+    }
 
     if (category.length > 0) {
       productsCopy = productsCopy.filter((item) =>
@@ -76,7 +83,16 @@ const Collections = () => {
 
   useEffect(() => {
     applyFilterAndSort();
-  }, [category, subCategory, minPrice, maxPrice, sortType, products]);
+  }, [
+    category,
+    subCategory,
+    minPrice,
+    maxPrice,
+    sortType,
+    products,
+    search,
+    showSearch,
+  ]);
 
   useEffect(() => {
     setfilterProducts(products);
@@ -200,8 +216,8 @@ const Collections = () => {
         </div>
       </div>
 
-      {/* Product Grid Area (Your products will go here) */}
-      <div className="flex-1 border-2 border-dashed border-gray-200 p-4 rounded-2xl min-h-125">
+      {/* Product Grid Area*/}
+      <div className="flex-1 border-2 border-gray-200 p-4 rounded-2xl min-h-125">
         <div className="flex justify-between text-base sm:text-2xl mb-4">
           <Title text1={"All Products"} />
           <div className="flex items-center mb-4">
