@@ -84,6 +84,9 @@ import payPal from './payPal.svg'
 import visa from './visa.svg'
 import applePay from './applePay.svg'
 import filter from './filter.svg'
+import delete_icon from './delete_icon.svg'
+import sub from './sub.svg'
+import add from './add.svg'
 
 export const assets = {
     logo,
@@ -114,7 +117,10 @@ export const assets = {
     payPal,
     googlePay,
     visa,
-    filter
+    filter,
+    delete_icon,
+    sub,
+    add
 }
 
 export const products = [
