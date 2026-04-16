@@ -35,7 +35,7 @@ const addProduct = asyncHandler(async (req, res) => {
 
   let parsedSizes;
   try {
-    parsedSizes = typeof sizes === "String" ? JSON.parse(sizes) : sizes;
+    parsedSizes = typeof sizes === "string" ? JSON.parse(sizes) : sizes;
   } catch (error) {
     throw new ApiError(400, "Invalid format for sizes. Expected an array.");
   }
@@ -60,8 +60,40 @@ const addProduct = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, product, "Product added successfully"));
 });
 
-const listProducts = asyncHandler(async (req, res) => {});
-const removeProduct = asyncHandler(async (req, res) => {});
-const singleProduct = asyncHandler(async (req, res) => {});
+const listProducts = asyncHandler(async (req, res) => {
+  const allProducts = await Products.find({}).sort({ createdAt: -1 }); // Sort by newest first
+  if (!allProducts) throw new ApiError(400, "Products fetching failed");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(201, allProducts, "Products fetched successfully"));
+});
+const removeProduct = asyncHandler(async (req, res) => {
+  try {
+    const { id } = req.body;
+    const deletedProduct = await Products.findByIdAndDelete(id);
+
+    if (!deletedProduct) {
+      throw new ApiError(404, "Product not found; nothing to delete");
+    }
+    return res
+      .status(200)
+      .json(new ApiResponse(201, {}, "Removed product successfully!"));
+  } catch (error) {
+    throw new ApiError(400, "Removing product failed!");
+  }
+});
+const singleProduct = asyncHandler(async (req, res) => {
+  const { productId } = req.body;
+  const product = await Products.findById(productId);
+
+  if (!product) {
+    throw new ApiError(404, "Product not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(201, product, "Product fetched successfully"));
+});
 
 export { listProducts, addProduct, removeProduct, singleProduct };

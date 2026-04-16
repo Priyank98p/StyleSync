@@ -34,7 +34,6 @@ const productSchema = new mongoose.Schema(
     topSelling: {
       type: Boolean,
     },
-
   },
   {
     timestamps: true,
