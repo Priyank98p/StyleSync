@@ -6,6 +6,7 @@ import {
   singleProduct,
 } from "../controllers/product.controller.js";
 import { upload } from "../middleware/multer.middleware.js";
+import {verifyJWT, isAdmin } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
@@ -13,7 +14,7 @@ const router = Router();
 router.route("/allProducts").get(listProducts);
 
 // route for adding products
-router.route("/add").post(
+router.route("/add").post(verifyJWT,isAdmin,
   upload.fields([
     {
       name: "image1",
@@ -36,7 +37,7 @@ router.route("/add").post(
 );
 
 // route for removing product
-router.route("/remove").post(removeProduct);
+router.route("/remove").post(verifyJWT,isAdmin,removeProduct);
 
 // route for single product
 router.route("/single").post(singleProduct);

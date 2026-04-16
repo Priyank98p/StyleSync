@@ -10,7 +10,7 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
   const refreshToken = user.generateRefreshToken();
 
   user.refreshToken = refreshToken;
-  user.save({ validateBeforeSave: false });
+  await user.save({ validateBeforeSave: false });
 
   return { accessToken, refreshToken };
 };
@@ -35,6 +35,8 @@ const registerUser = asyncHandler(async (req, res) => {
     fullname,
     email,
     password,
+    // Automatically promote if the email matches your secret admin email
+    role: email === process.env.ADMIN_EMAIL ? "admin" : "user",
   });
 
   const userCreated = await User.findById(user._id).select(
@@ -51,7 +53,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) throw new ApiError(400, "Email is required!!");
+  if (!email || !password) throw new ApiError(400, "All fields are required");
 
   const user = await User.findOne({
     email,
@@ -117,5 +119,4 @@ const userLogout = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logout successfully!"));
 });
 
-const adminLogin = asyncHandler(async (req, res) => {});
-export { registerUser, loginUser, adminLogin, userLogout };
+export { registerUser, loginUser, userLogout };

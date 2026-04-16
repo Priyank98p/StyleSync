@@ -7,7 +7,7 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
   try {
     const token =
       req.cookies?.accessToken ||
-      req.header("Authorization")?.replace("Bearer", "");
+      req.header("Authorization")?.replace("Bearer ", "");
 
     if (!token) throw new ApiError(401, "Unauthorized access!");
 
@@ -27,4 +27,12 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
   }
 });
 
-export { verifyJWT };
+const isAdmin = asyncHandler(async (req, _, next) => {
+  if (req.user && req.user.role === "admin") {
+    next();
+  } else {
+    throw new ApiError(401, "Access denied, admins only");
+  }
+});
+
+export { verifyJWT, isAdmin };
