@@ -12,7 +12,7 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     image: {
-      type: Array,
+      type: [String],
       required: true,
     },
     price: {
@@ -27,17 +27,14 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    size: {
-      type: String,
+    sizes: {
+      type: [String],
       required: true,
     },
     topSelling: {
       type: Boolean,
     },
-    date: {
-      type: Number,
-      required: true,
-    },
+
   },
   {
     timestamps: true,
