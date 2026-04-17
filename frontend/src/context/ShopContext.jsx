@@ -1,5 +1,4 @@
-import { createContext, useState } from "react";
-import { products } from "../assets/assets";
+import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -8,9 +7,13 @@ export const ShopContext = createContext();
 const ShopContextProvider = (props) => {
   const currency = "$";
   const delivery_fee = 10;
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [cartItems, setCartItems] = useState({});
+  const [products, setProducts] = useState([]);
+  const [token, setToken] = useState([])
 
   const addToCart = async (itemId, size) => {
     let cartData = structuredClone(cartItems);
@@ -49,6 +52,36 @@ const ShopContextProvider = (props) => {
     return totalCount;
   };
 
+  useEffect(() => {
+    const getProductData = async () => {
+      try {
+        const response = await fetch(
+          `${backendUrl}/api/v1/products/allProducts`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        console.log(response);
+
+        const data = await response.json();
+        console.log(data);
+        if (data.success) {
+          setProducts(data.data);
+        } else {
+          console.error(data.message);
+        }
+      } catch (error) {
+        console.error(error.message);
+      }
+    };
+
+    getProductData();
+  }, [backendUrl]);
+
   const updateQuantity = async (itemId, size, quantity) => {
     let cartData = structuredClone(cartItems);
     cartData[itemId][size] = quantity;
@@ -82,6 +115,9 @@ const ShopContextProvider = (props) => {
     getCartCount,
     updateQuantity,
     getCartAmount,
+    backendUrl,
+    token,
+    setToken
   };
 
   return (

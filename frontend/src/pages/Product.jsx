@@ -23,7 +23,7 @@ const Product = () => {
 
   useEffect(() => {
     fetchProductData();
-  }, [productId]);
+  }, [productId, products]);
   return productData ? (
     <div className="pt-10 transition-opacity ease-in duration-500 opacity-100">
       <div className="flex gap-12 sm:gap-12 flex-col sm:flex-row">
@@ -75,7 +75,7 @@ const Product = () => {
               {productData.sizes.map((item, index) => (
                 <button
                   onClick={() => setSize(item)}
-                  className={`border w-12 h-12 rounded-full cursor-pointer py-2 px-4 bg-gray-100 ${item === size ? "bg-gray-900 text-white " : ""}`}
+                  className={`border w-12 h-12 rounded-full cursor-pointer py-2 px-2 bg-gray-100 ${item === size ? "bg-gray-900 text-white " : ""}`}
                   key={index}
                 >
                   {item}
