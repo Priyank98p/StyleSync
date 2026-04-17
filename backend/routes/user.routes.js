@@ -14,6 +14,9 @@ router.route("/register").post(registerUser);
 // route for userlogin
 router.route("/login").post(loginUser);
 
+// admin login route
+router.route("/admin").post(loginUser);
+
 // route for userlogout
 router.route("/logout").post(verifyJWT, userLogout);
 
