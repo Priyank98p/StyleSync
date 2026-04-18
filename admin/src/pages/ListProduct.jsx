@@ -7,33 +7,8 @@ import { assets } from "../assets/assets.js";
 const ListProduct = () => {
   const [listItems, setListItems] = useState([]);
   const { token } = useOutletContext();
-  const fetchListItems = async () => {
-    try {
-      const response = await fetch(
-        `${backendUrl}/api/v1/products/allProducts`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
 
-      const data = await response.json();
-
-      if (data.success) {
-        setListItems(data.data);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.error("Fetch Error:", error.message);
-      toast.error("Failed to load products");
-    }
-  };
-
-  const removeProduct = async (productId) => {
+  const removeProduct = async (productId, fetchListItems) => {
     try {
       const response = await fetch(`${backendUrl}/api/v1/products/remove`, {
         method: "POST",
@@ -58,12 +33,40 @@ const ListProduct = () => {
   };
 
   useEffect(() => {
-    fetchListItems();
-  }, []);
+    const fetchListItems = async () => {
+      try {
+        const response = await fetch(
+          `${backendUrl}/api/v1/products/all-products`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          },
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+          setListItems(data.data);
+        } else {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        console.error("Fetch Error:", error.message);
+        toast.error("Failed to load products");
+      }
+    };
+
+    (async () => {
+      await fetchListItems();
+    })();
+  }, [token]);
   return (
     <div>
       <p className="mb-2">All Products List</p>
-      <div className="flex flex-col gap-">
+      <div className="flex flex-col gap-1">
         <div className="hidden sm:grid grid-cols-[1fr_3fr_1fr_1fr_1fr] items-center py-2 px-4 border-gray-200 bg-gray-100 text-sm rounded-md">
           <b>Image</b>
           <b>Name</b>
@@ -95,7 +98,34 @@ const ListProduct = () => {
 
               <div className="flex justify-center">
                 <img
-                  onClick={() => removeProduct(item._id)}
+                  onClick={() => {
+                    const fetchListItems = async () => {
+                      try {
+                        const response = await fetch(
+                          `${backendUrl}/api/v1/products/allProducts`,
+                          {
+                            method: "GET",
+                            headers: {
+                              Authorization: `Bearer ${token}`,
+                              "Content-Type": "application/json",
+                            },
+                          },
+                        );
+
+                        const data = await response.json();
+
+                        if (data.success) {
+                          setListItems(data.data);
+                        } else {
+                          toast.error(data.message);
+                        }
+                      } catch (error) {
+                        console.error("Fetch Error:", error.message);
+                        toast.error("Failed to load products");
+                      }
+                    };
+                    removeProduct(item._id, fetchListItems);
+                  }}
                   className="w-7 cursor-pointer hover:opacity-75 transition-opacity"
                   src={assets.remove}
                   alt="Remove"
