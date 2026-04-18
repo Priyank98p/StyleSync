@@ -11,7 +11,7 @@ import {verifyJWT, isAdmin } from "../middleware/auth.middleware.js";
 const router = Router();
 
 // route for listing products
-router.route("/allProducts").get(listProducts);
+router.route("/all-products").get(listProducts);
 
 // route for adding products
 router.route("/add").post(verifyJWT,isAdmin,

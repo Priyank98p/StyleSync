@@ -29,9 +29,27 @@ app.use(cookieParser());
 
 // api endpoints
 import userRouter from "./routes/user.routes.js";
-import productRouter from "./routes/product.route.js"
+import productRouter from "./routes/product.route.js";
+import cartRouter from "./routes/cart.route.js"
+import orderRouter from "./routes/order.route.js"
 
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/products", productRouter)
+app.use("/api/v1/products", productRouter);
+app.use("/api/v1/cart",cartRouter)
+app.use("/api/v1/orders",orderRouter)
+
+// Global Error Handling Middleware
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+
+  // This sends a JSON response instead of an HTML page
+  res.status(statusCode).json({
+    success: false,
+    message: message,
+    errors: err.errors || [],
+    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
+  });
+});
 
 export { app };
