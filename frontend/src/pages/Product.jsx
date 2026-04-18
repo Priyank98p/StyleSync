@@ -1,15 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/assets";
 import RelatedProducts from "../components/RelatedProducts";
+import { toast } from "react-toastify";
 
 const Product = () => {
   const { productId } = useParams();
-  const { products, currency, addToCart } = useContext(ShopContext);
+  const { products, currency, addToCart, token } = useContext(ShopContext);
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
   const [size, setSize] = useState("");
+  const navigate = useNavigate();
 
   const fetchProductData = async () => {
     products.map((item) => {
@@ -84,7 +86,7 @@ const Product = () => {
             </div>
           </div>
           <button
-            onClick={() => addToCart(productData._id, size)}
+            onClick={() => (token ? addToCart(productData._id, size) : navigate("/login") && toast.info("Please login to continue"))}
             className="bg-black text-white text-center px-8 py-3 rounded-4xl active:bg-gray-600 cursor-pointer"
           >
             Add to Cart

@@ -19,7 +19,7 @@ const NewsLetterBox = () => {
         className="flex flex-col justify-center gap-3"
         action=""
       >
-        <div className="flex items-center w-full justify-start rounded-full bg-white px-10 py-4 ">
+        <div className="flex items-center w-full rounded-full bg-white px-4 py-4 ">
           <img className="w-10" src={assets.mail} alt="" />
           <input
             type="email"
@@ -28,7 +28,7 @@ const NewsLetterBox = () => {
           />
         </div>
         <button
-          className="bg-gray-300 text-black hover:bg-gray-200 py-4 cursor-pointer rounded-full px-16 text-lg transition-all font-semibold"
+          className="bg-gray-300 text-black hover:bg-gray-200 py-4 cursor-pointer rounded-full px-10 text-lg transition-all font-semibold"
           type="submit"
         >
           Subscribe to Newsletter

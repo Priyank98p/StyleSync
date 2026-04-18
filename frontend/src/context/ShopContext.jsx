@@ -13,7 +13,7 @@ const ShopContextProvider = (props) => {
   const [showSearch, setShowSearch] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const [products, setProducts] = useState([]);
-  const [token, setToken] = useState([])
+  const [token, setToken] = useState("")
 
   const addToCart = async (itemId, size) => {
     let cartData = structuredClone(cartItems);
@@ -34,15 +34,27 @@ const ShopContextProvider = (props) => {
     }
 
     setCartItems(cartData);
+
+   if(token){
+      await fetch(`${backendUrl}/api/v1/cart/add-to-cart`,
+        {
+          method:"POST",
+          headers: {
+             Authorization : `Bearer ${token}`,
+             "Content-Type": "application/json"
+          },
+          body:JSON.stringify({itemId,size})
+        }
+      )
+    }
   };
 
   const getCartCount = () => {
     let totalCount = 0;
     for (const items in cartItems) {
-      console.log(items);
+
       for (const item in cartItems[items]) {
-        console.log(item);
-        console.log(cartItems[items][item]);
+        
         if (cartItems[items][item] > 0) {
           totalCount += 1;
         }
@@ -52,33 +64,52 @@ const ShopContextProvider = (props) => {
     return totalCount;
   };
 
-  useEffect(() => {
-    const getProductData = async () => {
-      try {
-        const response = await fetch(
-          `${backendUrl}/api/v1/products/allProducts`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
+  const getProductData = async () => {
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/v1/products/all-products`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+        },
+      );
 
-        console.log(response);
+      const data = await response.json();
 
-        const data = await response.json();
-        console.log(data);
-        if (data.success) {
-          setProducts(data.data);
-        } else {
-          console.error(data.message);
-        }
-      } catch (error) {
-        console.error(error.message);
+      if (data.success) {
+        setProducts(data.data);
+      } else {
+        console.error(data.message);
       }
-    };
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
 
+  const getUserCartData = async (token) => {
+    try {
+      const response = await fetch(
+        `${backendUrl}/api/v1/cart/get-cart`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      const data = await response.json();
+      if (data.success) {
+        setCartItems(data.data);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  useEffect(() => {
     getProductData();
   }, [backendUrl]);
 
@@ -86,7 +117,38 @@ const ShopContextProvider = (props) => {
     let cartData = structuredClone(cartItems);
     cartData[itemId][size] = quantity;
     setCartItems(cartData);
+
+    if(token){
+      await fetch(`${backendUrl}/api/v1/cart/update-cart`,
+        {
+          method:"POST",
+          headers: {
+             Authorization : `Bearer ${token}`,
+             "Content-Type": "application/json"
+          },
+          body: JSON.stringify({itemId,size,quantity})
+        }
+      )
+    }
   };
+
+useEffect(() => {
+  
+  const storedToken = localStorage.getItem('token');
+  if (storedToken) {
+    setToken(storedToken);
+    getUserCartData(storedToken); 
+  }
+}, []);
+
+useEffect(() => {
+  if(token){
+    getUserCartData(token)
+  }else{
+
+    setCartItems()
+  }
+},[token])
 
   const getCartAmount = () => {
     let totalAmount = 0;
@@ -94,7 +156,7 @@ const ShopContextProvider = (props) => {
     for (const items in cartItems) {
       let productInfo = products.find((product) => product._id === items);
       for (const item in cartItems[items]) {
-        if (cartItems[items][item] > 0) {
+        if (productInfo && cartItems[items][item] > 0) {
           totalAmount += productInfo.price * cartItems[items][item];
         }
       }
@@ -113,6 +175,7 @@ const ShopContextProvider = (props) => {
     cartItems,
     addToCart,
     getCartCount,
+    setCartItems,
     updateQuantity,
     getCartAmount,
     backendUrl,

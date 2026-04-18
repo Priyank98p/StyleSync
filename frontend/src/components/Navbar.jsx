@@ -2,10 +2,13 @@ import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const {
     showSearch,
     setShowSearch,
@@ -15,10 +18,34 @@ const Navbar = () => {
     setCartItems,
   } = useContext(ShopContext);
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken("");
-    navigate("/login");
+  const logout = async () => {
+    setIsLoggingOut(true);
+    if (!token) return;
+    try {
+      const response = await fetch(`${backendUrl}/api/v1/users/logout`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+      const data = await response.json();
+      console.log(data)
+      if (data.success) {
+        toast.success(data.message)
+        localStorage.removeItem("token");
+        setToken("");
+        setCartItems({});
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Logout Error:", error.message);
+      localStorage.removeItem("token");
+      setToken("");
+      setCartItems({});
+      navigate("/login");
+    }
+    setIsLoggingOut(false);
   };
 
   return (
@@ -106,7 +133,7 @@ const Navbar = () => {
                   Orders
                 </p>
                 <p onClick={logout} className="cursor-pointer hover:text-black">
-                  Logout
+                  {isLoggingOut ? "Logging out..." : "Logout"}
                 </p>
               </div>
             </div>

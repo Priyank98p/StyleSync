@@ -113,10 +113,9 @@ const Collections = () => {
             <img className="h-4" src={assets.filter} alt="" />
           </p>
         </div>
-
-        {/* ========================================= */}
+        
         {/* THE DRAWER (Mobile) / THE SIDEBAR (Desktop) */}
-        {/* ========================================= */}
+       
         <div
           className={`
             fixed inset-0 z-50 bg-white p-6 transition-transform duration-300 ease-in-out
