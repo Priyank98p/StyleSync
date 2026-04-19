@@ -22,7 +22,7 @@ import insta_svg from './insta.svg'
 import github_svg from './github.svg'
 import googlePay from './googlePay.svg'
 import masterCard from './masterCard.svg'
-import payPal from './payPal.svg'
+import paypal from './paypal.svg'
 import visa from './visa.svg'
 import applePay from './applePay.svg'
 import filter from './filter.svg'
@@ -55,7 +55,7 @@ export const assets = {
     github_svg,
     applePay,
     masterCard,
-    payPal,
+    paypal,
     googlePay,
     visa,
     filter,

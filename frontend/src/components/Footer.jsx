@@ -104,7 +104,7 @@ const Footer = () => {
               <img src={assets.googlePay} alt="" />
             </span>
             <span className="rounded-xl p-2 border-2 border-gray-300 cursor-pointer hover:scale-105">
-              <img src={assets.payPal} alt="" />
+              <img src={assets.paypal} alt="" />
             </span>
           </div>
         </div>
