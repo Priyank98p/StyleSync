@@ -16,7 +16,6 @@ const PlaceOrder = () => {
     cartItems,
     setCartItems,
     products,
-    getCartCount,
     getCartAmount,
     delivery_fee,
   } = useContext(ShopContext);
@@ -31,6 +30,46 @@ const PlaceOrder = () => {
     country: "",
     phone: "",
   });
+
+  const initPay = (order) => {
+    if (!order) {
+    toast.error("Order initialization failed");
+    return;
+  }
+  const options = {
+    key: import.meta.env.VITE_RAZORPAY_KEY_ID, 
+    amount: order.amount,
+    currency: order.currency,
+    name: "StyleSync",
+    description: "Order Payment",
+    order_id: order.id, 
+    handler: async (response) => {
+      try {
+        const res = await fetch(`${backendUrl}/api/v1/orders/verify-razorpay`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ ...response, orderId: order.notes.orderId }),
+        });
+        
+        const verificationData = await res.json();
+        if (verificationData.success) {
+          setCartItems({});
+          navigate("/orders");
+          toast.success("Payment Successful!");
+        }
+      } catch (error) {
+        console.log(error)
+        toast.error("Verification failed");
+      }
+    },
+    theme: { color: "#000000" },
+  };
+  const rzp = new window.Razorpay(options);
+  rzp.open();
+};
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
@@ -83,15 +122,47 @@ const PlaceOrder = () => {
           }
           break;
         }
-        case "stripe":
-          // Future Stripe Logic
-          toast.info("Stripe integration coming soon");
+        case "Stripe": {
+          const stripeResponse = await fetch(
+            `${backendUrl}/api/v1/orders/stripe`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify(orderData),
+            },
+          );
+          const data = await stripeResponse.json();
+          if (data.success) {
+            const { session_url } = data.data;
+            window.location.replace(session_url);
+          } else {
+            toast.error(data.message);
+          }
           break;
+        }
 
-        case "razorpay":
-          // Future Razorpay Logic
-          toast.info("Razorpay integration coming soon");
+        case "Razorpay": {
+          const response = await fetch(`${backendUrl}/api/v1/orders/razorpay`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(orderData),
+          });
+
+          const responseData = await response.json();
+
+          if (responseData.success) {
+            initPay(responseData.data);
+          } else {
+            toast.error(responseData.message);
+          }
           break;
+        }
 
         default:
           break;
@@ -218,20 +289,20 @@ const PlaceOrder = () => {
           <Title text1={"Payment method"} />
           <div className="flex gap-3 flex-col lg:flex-row">
             <div
-              onClick={() => setMethod("stripe")}
+              onClick={() => setMethod("Stripe")}
               className="flex items-center border border-gray-400 rounded-xl gap-3 p-2 px-3 cursor-pointer"
             >
               <p
-                className={`min-w-3.5 h-3.5 border border-gray-500 rounded-full  ${method === "stripe" ? "bg-green-400" : ""}`}
+                className={`min-w-3.5 h-3.5 border border-gray-500 rounded-full  ${method === "Stripe" ? "bg-green-400" : ""}`}
               ></p>
               <img className="h-5 mx-4" src={assets.stripe_logo} alt="" />
             </div>
             <div
-              onClick={() => setMethod("razorpay")}
+              onClick={() => setMethod("Razorpay")}
               className="flex items-center border border-gray-400 rounded-xl gap-3 p-2 px-3 cursor-pointer"
             >
               <p
-                className={`min-w-3.5 h-3.5 border border-gray-500 rounded-full ${method === "razorpay" ? "bg-green-400" : ""}`}
+                className={`min-w-3.5 h-3.5 border border-gray-500 rounded-full ${method === "Razorpay" ? "bg-green-400" : ""}`}
               ></p>
               <img className="h-5 mx-4" src={assets.razorpay_logo} alt="" />
             </div>

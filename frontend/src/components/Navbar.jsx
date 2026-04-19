@@ -2,51 +2,14 @@ import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets";
 import { NavLink, Link, useNavigate } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
-import { toast } from "react-toastify";
+import ProfileView from "./ProfileView";
 
 const Navbar = () => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const {
-    showSearch,
-    setShowSearch,
-    getCartCount,
-    token,
-    setToken,
-    setCartItems,
-  } = useContext(ShopContext);
-
-  const logout = async () => {
-    setIsLoggingOut(true);
-    if (!token) return;
-    try {
-      const response = await fetch(`${backendUrl}/api/v1/users/logout`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-      });
-      const data = await response.json();
-      console.log(data)
-      if (data.success) {
-        toast.success(data.message)
-        localStorage.removeItem("token");
-        setToken("");
-        setCartItems({});
-        navigate("/login");
-      }
-    } catch (error) {
-      console.error("Logout Error:", error.message);
-      localStorage.removeItem("token");
-      setToken("");
-      setCartItems({});
-      navigate("/login");
-    }
-    setIsLoggingOut(false);
-  };
+  const [profileOpen, setProfileOpen] = useState(false);
+  const { showSearch, setShowSearch, getCartCount, token } =
+    useContext(ShopContext);
 
   return (
     <div className="flex sm:sticky sm:z-10 sm:top-0 sm:bg-white items-center justify-between py-5 font-medium border-b border-gray-300">
@@ -106,7 +69,10 @@ const Navbar = () => {
           )}
         </NavLink>
       </ul>
-      <div className="flex items-center gap-6">
+      <div
+        className="flex items-center gap-6"
+        onMouseLeave={() => setProfileOpen(false)}
+      >
         <img
           onClick={() => setShowSearch(!showSearch)}
           src={assets.search_icon}
@@ -115,29 +81,20 @@ const Navbar = () => {
         />
         <div className="group relative">
           <img
-            onClick={() => (token ? null : navigate("/login"))}
+            onClick={() => {
+              if (token) {
+                setProfileOpen(!profileOpen);
+              } else {
+                navigate("/login");
+              }
+            }}
             src={assets.profile_icon}
             className="w-8 cursor-pointer"
             alt=""
           />
 
           {/* dropdown */}
-          {token && (
-            <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
-              <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
-                <p className="cursor-pointer hover:text-black">My profiles</p>
-                <p
-                  onClick={() => navigate("/orders")}
-                  className="cursor-pointer hover:text-black"
-                >
-                  Orders
-                </p>
-                <p onClick={logout} className="cursor-pointer hover:text-black">
-                  {isLoggingOut ? "Logging out..." : "Logout"}
-                </p>
-              </div>
-            </div>
-          )}
+          {token && <ProfileView isOpen={profileOpen} setProfileOpen={setProfileOpen} />}
         </div>
         <Link to="/cart" className="relative">
           <img src={assets.cart_icon} className="w-5 min-w-5" alt="" />

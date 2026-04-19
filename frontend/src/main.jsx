@@ -13,6 +13,7 @@ import Collections from "./pages/Collections.jsx";
 import Cart from "./pages/Cart.jsx";
 import About from "./pages/About.jsx";
 import ShopContextProvider from "./context/ShopContext.jsx";
+import Verify from "./pages/Verify.jsx";
 
 // Initializes the data router to manage browser history state and enable fast client-side navigation without full page reloads.
 const router = createBrowserRouter([
@@ -59,6 +60,10 @@ const router = createBrowserRouter([
         path: "orders",
         element: <Orders />,
       },
+      {
+        path: "Verify",
+        element: <Verify/>
+      }
     ],
   },
 ]);
