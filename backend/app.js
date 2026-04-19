@@ -7,7 +7,7 @@ const app = express();
 
 app.use(
   cors({
-    // Sets which domain can access your resources (usually defined in .env)
+    // Sets which domain can access resources
     origin: process.env.CORS_ORIGIN,
     // Allows the server to accept cookies/headers from the frontend
     credentials: true,
@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 
 // Middleware to parse cookies from the request headers
-// Allows you to access cookies via req.cookies
+// Allows to access cookies via req.cookies
 app.use(cookieParser());
 
 // api endpoints
