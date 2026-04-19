@@ -1,12 +1,12 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import {toast} from "react-toastify"
+import { toast } from "react-toastify";
 import { assets } from "../assets/assets.js";
 import { useOutletContext } from "react-router-dom";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
-  const { token,backendUrl,currency } = useOutletContext()
+  const { token, backendUrl, currency } = useOutletContext();
 
   const fetchOrders = async () => {
     if (!token) return null;
@@ -21,7 +21,7 @@ const Orders = () => {
       });
 
       const data = await response.json();
-      console.log(data);
+
       if (data.success) {
         setOrders(data.data.reverse()); // Show latest orders at the top
       } else {
@@ -30,6 +30,30 @@ const Orders = () => {
     } catch (error) {
       console.error(error);
       toast.error("Failed to load all orders");
+    }
+  };
+
+  const updateStatus = async (orderId,e) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/v1/orders/status`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderId, status: e }),
+      });
+
+      const data = await response.json()
+      if (data.success) {
+      await fetchOrders()
+      toast.success(data.message)
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Status update error!");
     }
   };
 
@@ -49,7 +73,7 @@ const Orders = () => {
           <div>
             <div>
               {order.items.map((item, idx) => (
-                <p key={idx} className="py-0.5">
+                <p key={`${item._id}-${item.size}`} className="py-0.5">
                   {item.name} x {item.quantity} <span>{item.size}</span>
                   {idx !== order.items.length - 1 && ","}
                 </p>
@@ -71,7 +95,6 @@ const Orders = () => {
             <p>{order.address.phone}</p>
           </div>
 
-          {/* Column 3: Stats */}
           <div>
             <p className="text-sm sm:text-[15px]">
               Items: {order.items.length}
@@ -87,7 +110,6 @@ const Orders = () => {
             {order.amount}
           </p>
 
-          {/* Column 5: Status Update Dropdown */}
           <select
             value={order.status}
             onChange={(e) => updateStatus(order._id, e.target.value)}
