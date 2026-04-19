@@ -173,7 +173,15 @@ const verifyRazorpay = async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, orderId } = req.body;
     const userId = req.user._id;
     if (razorpay_order_id && razorpay_payment_id) {
-      await Order.findOneAndUpdate(orderId, { payment: true });
+      const updatedOrder = await Order.findByIdAndUpdate(orderId, {
+        payment: true,
+      });
+
+      if (!updatedOrder) {
+        return res
+          .status(404)
+          .json(new ApiResponse(404, {}, "Order not found"));
+      }
 
       await User.findByIdAndUpdate(userId, { cartData: {} });
       return res
