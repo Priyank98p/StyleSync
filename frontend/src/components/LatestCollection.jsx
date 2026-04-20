@@ -5,7 +5,7 @@ import ProductsItem from "./ProductsItem";
 import Skeleton from "react-loading-skeleton";
 
 const LatestCollection = () => {
-  const { products,isLoading } = useContext(ShopContext);
+  const { products, isLoading } = useContext(ShopContext);
   const [latestProducts, setLatestProducts] = useState([]);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const LatestCollection = () => {
               .fill(0)
               .map((_, i) => (
                 <div key={i}>
-                  <Skeleton height={300} />
+                  <Skeleton height={300}  className="rounded-2xl shadow-sm border border-gray-100"/>
                   <Skeleton width="80%" className="mt-2" />
                   <Skeleton width="40%" />
                 </div>

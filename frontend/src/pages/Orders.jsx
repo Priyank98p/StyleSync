@@ -59,7 +59,7 @@ const Orders = () => {
                     <div className="flex items-start gap-6">
                       <Skeleton width={80} height={80} />
                       <div>
-                        <Skeleton width={150} height={20} />
+                        <Skeleton width={150} height={20} className="rounded-xl shadow-sm border border-gray-100"/>
                         <Skeleton width={100} className="mt-2" />
                       </div>
                     </div>
