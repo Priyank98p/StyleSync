@@ -14,6 +14,7 @@ import Cart from "./pages/Cart.jsx";
 import About from "./pages/About.jsx";
 import ShopContextProvider from "./context/ShopContext.jsx";
 import Verify from "./pages/Verify.jsx";
+import 'react-loading-skeleton/dist/skeleton.css'
 
 // Initializes the data router to manage browser history state and enable fast client-side navigation without full page reloads.
 const router = createBrowserRouter([

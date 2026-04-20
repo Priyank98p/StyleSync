@@ -29,7 +29,7 @@ const Cart = () => {
   }, [cartItems, products]);
   return (
     <div className="pt-10">
-      <div className="text-5xl mb-8">
+      <div className="text-4xl mb-8">
         <Title text1={"Your Cart"} />
       </div>
 
@@ -39,7 +39,7 @@ const Cart = () => {
         <div className="w-full">
           {cartData.length === 0 ? (
             <div className="border w-full h-100 gap-12 border-gray-300 rounded-3xl py-3 px-2 flex flex-col justify-center items-center">
-              <p className="text-5xl font-extrabold">Your Cart Is Empty!</p>
+              <p className="text-3xl font-extrabold">Your Cart Is Empty!</p>
               <Link to="/collections">
                 <button className="py-4 px-6 border rounded-4xl w-50 bg-black text-white cursor-pointer transition ease-in-out hover:scale-102 hover:bg-gray-800">
                   Shop Now

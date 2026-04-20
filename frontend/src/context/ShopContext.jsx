@@ -13,7 +13,8 @@ const ShopContextProvider = (props) => {
   const [showSearch, setShowSearch] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const [products, setProducts] = useState([]);
-  const [token, setToken] = useState("")
+  const [token, setToken] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const addToCart = async (itemId, size) => {
     let cartData = structuredClone(cartItems);
@@ -35,26 +36,22 @@ const ShopContextProvider = (props) => {
 
     setCartItems(cartData);
 
-   if(token){
-      await fetch(`${backendUrl}/api/v1/cart/add-to-cart`,
-        {
-          method:"POST",
-          headers: {
-             Authorization : `Bearer ${token}`,
-             "Content-Type": "application/json"
-          },
-          body:JSON.stringify({itemId,size})
-        }
-      )
+    if (token) {
+      await fetch(`${backendUrl}/api/v1/cart/add-to-cart`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ itemId, size }),
+      });
     }
   };
 
   const getCartCount = () => {
     let totalCount = 0;
     for (const items in cartItems) {
-
       for (const item in cartItems[items]) {
-        
         if (cartItems[items][item] > 0) {
           totalCount += 1;
         }
@@ -66,6 +63,7 @@ const ShopContextProvider = (props) => {
 
   const getProductData = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(
         `${backendUrl}/api/v1/products/all-products`,
         {
@@ -85,21 +83,20 @@ const ShopContextProvider = (props) => {
       }
     } catch (error) {
       console.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const getUserCartData = async (token) => {
     try {
-      const response = await fetch(
-        `${backendUrl}/api/v1/cart/get-cart`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
+      const response = await fetch(`${backendUrl}/api/v1/cart/get-cart`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-      );
+      });
       const data = await response.json();
       if (data.success) {
         setCartItems(data.data);
@@ -118,37 +115,33 @@ const ShopContextProvider = (props) => {
     cartData[itemId][size] = quantity;
     setCartItems(cartData);
 
-    if(token){
-      await fetch(`${backendUrl}/api/v1/cart/update-cart`,
-        {
-          method:"POST",
-          headers: {
-             Authorization : `Bearer ${token}`,
-             "Content-Type": "application/json"
-          },
-          body: JSON.stringify({itemId,size,quantity})
-        }
-      )
+    if (token) {
+      await fetch(`${backendUrl}/api/v1/cart/update-cart`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ itemId, size, quantity }),
+      });
     }
   };
 
-useEffect(() => {
-  
-  const storedToken = localStorage.getItem('token');
-  if (storedToken) {
-    setToken(storedToken);
-    getUserCartData(storedToken); 
-  }
-}, []);
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+      getUserCartData(storedToken);
+    }
+  }, []);
 
-useEffect(() => {
-  if(token){
-    getUserCartData(token)
-  }else{
-
-    setCartItems()
-  }
-},[token])
+  useEffect(() => {
+    if (token) {
+      getUserCartData(token);
+    } else {
+      setCartItems();
+    }
+  }, [token]);
 
   const getCartAmount = () => {
     let totalAmount = 0;
@@ -179,8 +172,9 @@ useEffect(() => {
     updateQuantity,
     getCartAmount,
     backendUrl,
+    isLoading,
     token,
-    setToken
+    setToken,
   };
 
   return (

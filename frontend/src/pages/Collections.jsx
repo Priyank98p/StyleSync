@@ -4,6 +4,7 @@ import { assets } from "../assets/assets";
 import Title from "../components/Title";
 import ProductsItem from "../components/ProductsItem";
 import PriceSlider from "../components/PriceSlider";
+import Skeleton from "react-loading-skeleton";
 
 const Collections = () => {
   const [showFilters, setShowFilter] = useState(false);
@@ -15,7 +16,7 @@ const Collections = () => {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(500);
 
-  const { products, search, showSearch } = useContext(ShopContext);
+  const { products, search, showSearch, isLoading } = useContext(ShopContext);
 
   const toggleCategory = (e) => {
     if (category.includes(e.target.value)) {
@@ -113,9 +114,9 @@ const Collections = () => {
             <img className="h-4" src={assets.filter} alt="" />
           </p>
         </div>
-        
+
         {/* THE DRAWER (Mobile) / THE SIDEBAR (Desktop) */}
-       
+
         <div
           className={`
             fixed inset-0 z-50 bg-white p-6 transition-transform duration-300 ease-in-out
@@ -235,15 +236,25 @@ const Collections = () => {
 
         {/* Products */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-2">
-          {filterProducts.map((item) => (
-            <ProductsItem
-              key={item._id}
-              name={item.name}
-              id={item._id}
-              price={item.price}
-              image={item.image}
-            />
-          ))}
+          {isLoading
+            ? Array(8)
+                .fill(0)
+                .map((_, i) => (
+                  <div key={i}>
+                    <Skeleton height={250} className="rounded-2xl shadow-sm border border-gray-100" />
+                    <Skeleton width="80%" className="mt-2" />
+                    <Skeleton width="40%" />
+                  </div>
+                ))
+            : filterProducts.map((item) => (
+                <ProductsItem
+                  key={item._id}
+                  name={item.name}
+                  id={item._id}
+                  price={item.price}
+                  image={item.image}
+                />
+              ))}
         </div>
       </div>
     </div>
